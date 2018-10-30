@@ -62,8 +62,11 @@ public class TaskContentProvider extends ContentProvider {
         switch (match) {
             case TASKS:
                 long id = database.insert(TaskContract.TaskEntry.TABLE_NAME, null, values);
-                if (id > 0) {
-                    return ContentUris.withAppendedId(uri, id);
+                if (id > 0)
+                {
+                    Uri insertedUri=ContentUris.withAppendedId(uri, id);;
+                    getContext().getContentResolver().notifyChange(insertedUri,null);
+                    return uri;
                 } else {
                     Toast.makeText(getContext(), "Error onSaving Data On Database", Toast.LENGTH_SHORT).show();
                 }
@@ -79,7 +82,25 @@ public class TaskContentProvider extends ContentProvider {
     public Cursor query(@NonNull Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
 
-        throw new UnsupportedOperationException("Not yet implemented");
+        SQLiteDatabase writableDatabase = dbHelper.getWritableDatabase();
+        int match = sMatcher.match(uri);
+        Cursor query=null;
+        switch (match)
+        {
+            case TASKS:
+                query = writableDatabase.query(TaskContract.TaskEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+                break;
+            case TASKS_WITH_ID:
+                String id = uri.getPathSegments().get(1);
+                String Selection= TaskContract.TaskEntry._ID+"?";
+                String []SelectionArgs=new String[]{id};
+                query = writableDatabase.query(TaskContract.TaskEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
+
+                break;
+        }
+        query.setNotificationUri(getContext().getContentResolver(),uri);
+       return query;
+       // throw new UnsupportedOperationException("Not yet implemented");
     }
 
 
