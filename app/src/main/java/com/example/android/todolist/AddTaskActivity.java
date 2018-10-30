@@ -16,10 +16,18 @@
 
 package com.example.android.todolist;
 
+import android.content.ContentValues;
+import android.databinding.repacked.treelayout.internal.util.Contract;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.Toast;
+
+import com.example.android.todolist.data.TaskContract;
 
 
 public class AddTaskActivity extends AppCompatActivity {
@@ -43,7 +51,21 @@ public class AddTaskActivity extends AppCompatActivity {
      * It retrieves user input and inserts that new task data into the underlying database.
      */
     public void onClickAddTask(View view) {
-        // Not yet implemented
+        EditText editTextDescription = (EditText) findViewById(R.id.editTextTaskDescription);
+        String text = editTextDescription.getText().toString();
+        if(text.trim().length()<=0)
+        {
+            Toast.makeText(this, "You should like description for this task", Toast.LENGTH_SHORT).show();
+        }
+        ContentValues values=new ContentValues();
+        values.put(TaskContract.TaskEntry.COLUMN_DESCRIPTION,text);
+        values.put(TaskContract.TaskEntry.COLUMN_PRIORITY,mPriority);
+        Uri uri = getContentResolver().insert(TaskContract.TaskEntry.CONTENT_URI, values);
+        if(uri!=null)
+        {
+            Toast.makeText(this, "Inserted successfully with uri "+uri.toString(), Toast.LENGTH_SHORT).show();
+        }
+        finish();
     }
 
 
