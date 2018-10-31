@@ -82,7 +82,7 @@ public class TaskContentProvider extends ContentProvider {
     public Cursor query(@NonNull Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
 
-        SQLiteDatabase writableDatabase = dbHelper.getWritableDatabase();
+        SQLiteDatabase writableDatabase = dbHelper.getReadableDatabase();
         int match = sMatcher.match(uri);
         Cursor query = null;
         switch (match) {
@@ -91,8 +91,8 @@ public class TaskContentProvider extends ContentProvider {
                 break;
             case TASKS_WITH_ID:
                 String id = uri.getPathSegments().get(1);
-                String Selection = TaskContract.TaskEntry._ID + "?";
-                String[] SelectionArgs = new String[]{id};
+                 selection = TaskContract.TaskEntry._ID + "=?";
+                selectionArgs = new String[]{id};
                 query = writableDatabase.query(TaskContract.TaskEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
 
                 break;
@@ -134,6 +134,7 @@ public class TaskContentProvider extends ContentProvider {
                 numOfRowsUpdated = writableDatabase.update(TaskContract.TaskEntry.TABLE_NAME, values,selection,selectionArgs);
                 break;
         }
+        getContext().getContentResolver().notifyChange(uri,null);
        return numOfRowsUpdated;
     }
 

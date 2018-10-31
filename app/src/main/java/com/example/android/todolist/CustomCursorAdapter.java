@@ -38,6 +38,7 @@ public class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapte
     // Class variables for the Cursor that holds task data and the Context
     private Cursor mCursor;
     private Context mContext;
+    OnTaskListClick onTaskListClick;
 
 
     /**
@@ -45,8 +46,9 @@ public class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapte
      *
      * @param mContext the current Context
      */
-    public CustomCursorAdapter(Context mContext) {
+    public CustomCursorAdapter(Context mContext,OnTaskListClick onTaskListClick) {
         this.mContext = mContext;
+        this.onTaskListClick=onTaskListClick;
     }
 
 
@@ -156,7 +158,7 @@ public class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapte
 
 
     // Inner class for creating ViewHolders
-    class TaskViewHolder extends RecyclerView.ViewHolder {
+    class TaskViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         // Class variables for the task description and priority TextViews
         TextView taskDescriptionView;
@@ -169,9 +171,19 @@ public class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapte
          */
         public TaskViewHolder(View itemView) {
             super(itemView);
-
+          itemView.setOnClickListener(this);
             taskDescriptionView = (TextView) itemView.findViewById(R.id.taskDescription);
             priorityView = (TextView) itemView.findViewById(R.id.priorityTextView);
         }
+
+        @Override
+        public void onClick(View view) {
+            onTaskListClick.OnTaskClicked((int)itemView.getTag());
+        }
+    }
+    interface OnTaskListClick
+    {
+        public void OnTaskClicked(int taskID);
+
     }
 }
