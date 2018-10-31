@@ -123,7 +123,18 @@ public class TaskContentProvider extends ContentProvider {
     public int update(@NonNull Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
 
-        throw new UnsupportedOperationException("Not yet implemented");
+        SQLiteDatabase writableDatabase = dbHelper.getWritableDatabase();
+        int match = sMatcher.match(uri);
+        int numOfRowsUpdated = 0;
+        switch (match) {
+            case TASKS:
+                numOfRowsUpdated = writableDatabase.update(TaskContract.TaskEntry.TABLE_NAME, values,selection,selectionArgs);
+                break;
+            case TASKS_WITH_ID:
+                numOfRowsUpdated = writableDatabase.update(TaskContract.TaskEntry.TABLE_NAME, values,selection,selectionArgs);
+                break;
+        }
+       return numOfRowsUpdated;
     }
 
 
