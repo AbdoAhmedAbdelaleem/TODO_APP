@@ -62,10 +62,10 @@ public class TaskContentProvider extends ContentProvider {
         switch (match) {
             case TASKS:
                 long id = database.insert(TaskContract.TaskEntry.TABLE_NAME, null, values);
-                if (id > 0)
-                {
-                    Uri insertedUri=ContentUris.withAppendedId(uri, id);;
-                    getContext().getContentResolver().notifyChange(insertedUri,null);
+                if (id > 0) {
+                    Uri insertedUri = ContentUris.withAppendedId(uri, id);
+                    ;
+                    getContext().getContentResolver().notifyChange(insertedUri, null);
                     return uri;
                 } else {
                     Toast.makeText(getContext(), "Error onSaving Data On Database", Toast.LENGTH_SHORT).show();
@@ -84,30 +84,38 @@ public class TaskContentProvider extends ContentProvider {
 
         SQLiteDatabase writableDatabase = dbHelper.getWritableDatabase();
         int match = sMatcher.match(uri);
-        Cursor query=null;
-        switch (match)
-        {
+        Cursor query = null;
+        switch (match) {
             case TASKS:
                 query = writableDatabase.query(TaskContract.TaskEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             case TASKS_WITH_ID:
                 String id = uri.getPathSegments().get(1);
-                String Selection= TaskContract.TaskEntry._ID+"?";
-                String []SelectionArgs=new String[]{id};
+                String Selection = TaskContract.TaskEntry._ID + "?";
+                String[] SelectionArgs = new String[]{id};
                 query = writableDatabase.query(TaskContract.TaskEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
 
                 break;
         }
-        query.setNotificationUri(getContext().getContentResolver(),uri);
-       return query;
-       // throw new UnsupportedOperationException("Not yet implemented");
+        query.setNotificationUri(getContext().getContentResolver(), uri);
+        return query;
+        // throw new UnsupportedOperationException("Not yet implemented");
     }
 
 
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
 
-        throw new UnsupportedOperationException("Not yet implemented");
+        SQLiteDatabase writableDatabase = dbHelper.getWritableDatabase();
+        int match = sMatcher.match(uri);
+        int numOfRowsDeleted = 0;
+        switch (match) {
+            case TASKS_WITH_ID:
+                numOfRowsDeleted = writableDatabase.delete(TaskContract.TaskEntry.TABLE_NAME, selection,selectionArgs);
+                break;
+        }
+        getContext().getContentResolver().notifyChange(uri,null);
+        return numOfRowsDeleted;
     }
 
 

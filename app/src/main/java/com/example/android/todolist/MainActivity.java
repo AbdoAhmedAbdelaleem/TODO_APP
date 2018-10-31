@@ -18,6 +18,7 @@ package com.example.android.todolist;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
@@ -76,7 +77,11 @@ public class MainActivity extends AppCompatActivity implements
             // Called when a user swipes left or right on a ViewHolder
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-                // Here is where you'll implement swipe to delete
+                String id=((int) viewHolder.itemView.getTag())+"";
+                Uri path = TaskContract.TaskEntry.CONTENT_URI.buildUpon().appendPath(id).build();
+                getContentResolver().delete(path, TaskContract.TaskEntry._ID+"=?",new String[]{id});
+                getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null, MainActivity.this);
+
             }
         }).attachToRecyclerView(mRecyclerView);
 
